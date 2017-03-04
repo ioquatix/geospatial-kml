@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 require 'nokogiri'
+require 'geospatial/polygon'
 
 module Geospatial
 	module KML
@@ -38,9 +39,13 @@ module Geospatial
 			def polygons
 				@doc.css("Polygon").collect do |polygon_node|
 					coordinates_node = polygon_node.css("coordinates").first
-					text = coordinates_node.text.strip
 					
-					text.split(/\s+/).collect{|coordinate| coordinate.split(',').collect(&:to_f)}
+					text = coordinates_node.text.strip
+					coordinates = text.split(/\s+/).collect do |coordinate| 
+						Vector.elements(coordinate.split(',').collect(&:to_f).first(2))
+					end
+					
+					Polygon.new(coordinates)
 				end
 			end
 		end

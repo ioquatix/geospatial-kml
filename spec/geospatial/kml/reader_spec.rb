@@ -7,5 +7,6 @@ RSpec.describe Geospatial::KML::Reader do
 	
 	it "should have one polygon" do
 		expect(reader.polygons.count).to be == 1
+		expect(reader.polygons.first).to be_kind_of Geospatial::Polygon
 	end
 end
