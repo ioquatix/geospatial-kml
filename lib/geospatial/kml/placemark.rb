@@ -1,4 +1,4 @@
-# Copyright, 2017, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,35 +21,21 @@
 require 'nokogiri'
 require 'geospatial/polygon'
 
-require_relative 'placemark'
-
 module Geospatial
 	module KML
-		class Reader
-			def self.load_file(path)
-				doc = File.open(path) {|file| Nokogiri::XML(file)}
-				
-				return self.new(doc)
+		class Placemark
+			def initialize(node)
+				@node = node
 			end
 			
-			def initialize(doc)
-				@doc = doc
-			end
-			
-			attr :doc
-			
-			def placemarks
-				return to_enum(:placemarks) unless block_given?
-				
-				@doc.css("Placemark").collect do |node|
-					yield Placemark.new(node)
-				end
+			def name
+				@node.css("name").text.strip
 			end
 			
 			def polygons
 				return to_enum(:polygons) unless block_given?
 				
-				@doc.css("Polygon").collect do |polygon_node|
+				@node.css("Polygon").collect do |polygon_node|
 					coordinates_node = polygon_node.css("coordinates").first
 					
 					text = coordinates_node.text.strip
