@@ -19,6 +19,9 @@
 # THE SOFTWARE.
 
 require 'nokogiri'
+
+require 'geospatial/location'
+require 'geospatial/circle'
 require 'geospatial/polygon'
 
 module Geospatial
@@ -29,7 +32,27 @@ module Geospatial
 			end
 			
 			def name
-				@node.css("name").text.strip
+				if node = @node.css("name").first
+					node.text.strip
+				end
+			end
+			
+			def description
+				if node = @node.css("description").first
+					node.text.strip
+				end
+			end
+			
+			def bounding_circle
+				if look_at = @node.css("LookAt").first
+					longitude = look_at.css("longitude").first.text.to_f
+					latitude = look_at.css("latitude").first.text.to_f
+					range = look_at.css("range").first.text.to_f
+					
+					center = Location.new(longitude, latitude)
+					
+					return Circle.new(center, range)
+				end
 			end
 			
 			def polygons
