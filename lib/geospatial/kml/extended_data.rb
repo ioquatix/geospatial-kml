@@ -24,59 +24,28 @@ require 'geospatial/location'
 require 'geospatial/circle'
 require 'geospatial/polygon'
 
-require_relative 'extended_data'
-
 module Geospatial
 	module KML
-		class Placemark
+		class ExtendedData
+			include Enumerable
+			
 			def initialize(node)
 				@node = node
 			end
 			
 			attr :node
 			
-			def name
-				if node = @node.css("name").first
-					node.text.strip
-				end
-			end
-			
-			def description
-				if node = @node.css("description").first
-					node.text.strip
-				end
-			end
-			
-			def extended_data
-				if node = @node.css("ExtendedData").first
-					ExtendedData.new(node)
-				end
-			end
-			
-			def bounding_circle
-				if look_at = @node.css("LookAt").first
-					longitude = look_at.css("longitude").first.text.to_f
-					latitude = look_at.css("latitude").first.text.to_f
-					range = look_at.css("range").first.text.to_f
-					
-					center = Location.new(longitude, latitude)
-					
-					return Circle.new(center, range)
-				end
-			end
-			
-			def polygons(match = "Polygon, LineString")
-				return to_enum(:polygons, match) unless block_given?
+			def each
+				return to_enum unless block_given?
 				
-				@node.css(match).collect do |polygon_node|
-					coordinates_node = polygon_node.css("coordinates").first
-					
-					text = coordinates_node.text.strip
-					coordinates = text.split(/\s+/).collect do |coordinate| 
-						Vector.elements(coordinate.split(',').collect(&:to_f).first(2))
-					end
-					
-					yield Polygon.new(coordinates)
+				@node.css("SimpleData").each do |node|
+					yield node["name"].to_sym, node.text
+				end
+			end
+			
+			def [] key
+				if node = @node.css("SimpleData[name=#{key.to_s.dump}]")
+					node.text
 				end
 			end
 		end

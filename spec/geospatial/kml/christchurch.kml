@@ -32,6 +32,9 @@
 	</Style>
 	<Placemark>
 		<name>Christchurch Conversion Zone</name>
+		<ExtendedData><SchemaData>
+			<SimpleData name="id">1</SimpleData>
+		</SchemaData></ExtendedData>
 		<styleUrl>#m_ylw-pushpin</styleUrl>
 		<Polygon>
 			<tessellate>1</tessellate>
