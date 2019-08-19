@@ -55,10 +55,10 @@ module Geospatial
 				end
 			end
 			
-			def polygons
-				return to_enum(:polygons) unless block_given?
+			def polygons(match = "Polygon, LineString")
+				return to_enum(:polygons, match) unless block_given?
 				
-				@node.css("Polygon").collect do |polygon_node|
+				@node.css(match).collect do |polygon_node|
 					coordinates_node = polygon_node.css("coordinates").first
 					
 					text = coordinates_node.text.strip
